@@ -131,139 +131,6 @@
 	
 		<p>Kratak vodič kako kompajlirati i instalirati OpenBCM. Od podešavanja nisam daleko stigao, ali ako želite da se igrate kao i ja, ovo će vas dovesti do početne tačke.</p>
 <img src="/2018/11/23/Instaliranje-OpenBCM/openbcm-http.png">
-<p>Sajt autora programa: <a href="http://dnx274.org/baybox/" target="_blank" rel="noopener">http://dnx274.org/baybox/</a>, gde se može i naći dokumentacija.</p>
-<h2 id="depending"><a href="#depending" class="headerlink" title="depending"></a>depending</h2><h4 id="rasbian-debian-ubuntu"><a href="#rasbian-debian-ubuntu" class="headerlink" title="rasbian / debian / ubuntu"></a>rasbian / debian / ubuntu</h4><pre>
-sudo apt-get install -y build-essential git
-</pre>
-
-<p>Za 64 bitni sistem treba još dodati:</p>
-<pre>
-sudo apt-get install -y libc6-dev-i386 lib32stdc++-5-dev
-</pre>
-
-<h4 id="arch-linux"><a href="#arch-linux" class="headerlink" title="arch linux"></a>arch linux</h4><pre>
-sudo pacman -S git base-devel lib32-glibc lib32-gcc-libs
-</pre>
-
-<h2 id="korisnik"><a href="#korisnik" class="headerlink" title="korisnik"></a>korisnik</h2><p>BBS ćemo pokretati na posebnom korisniku, koji nema prava administratora. Neke funkcije zahtevaju administratorska prava, ali ću radije živeti bez njih ili tek kad budem siguran šta i kako radi dozvoliti.</p>
-<h4 id="pravljenje-korisnika-i-direktorijuma"><a href="#pravljenje-korisnika-i-direktorijuma" class="headerlink" title="pravljenje korisnika i direktorijuma"></a>pravljenje korisnika i direktorijuma</h4><p>Ja sam odabrao korisničko ime <strong>bcm</strong>, vi možete neko drugo. I direktorijum u kojem će stojati sve je <strong>/bcm</strong>, tako je bilo u nekom primeru pa sam to zadržao.</p>
-<pre>
-sudo useradd -m bcm
-sudo mkdir /bcm
-sudo chown bcm:bcm /bcm
-sudo chmod 0750 /bcm
-</pre>
-
-<h4 id="kompajliranje"><a href="#kompajliranje" class="headerlink" title="kompajliranje"></a>kompajliranje</h4><p>Sve dalje, osim par koraka radim sa <strong>bcm</strong> korisnika.</p>
-<pre>
-mkdir ~/src
-cd ~/src
-git clone https://github.com/oe5hpm/openBCM
-cd openBCM
-make
-</pre>
-
-<p>Ako komapjliranje ne prođe, verovatno na vašem sistemu nije zadovoljen depending koji sam gore naveo… Ja sam probao na ubuntu 16.04, rasbianu i archu.</p>
-<p>Pošto u samoj instalaciji nema primera konfiguracionih fajlova, ja sam sa sajta autora skinuo primere, i dodao još po nešto, i zakomentarisao neke stvari koje nisam još siguran kako rade.</p>
-<pre>
-git clone https://github.com/yu4zed/openbcm-example-config
-</pre>
-
-<p>Instaliranje:</p>
-<pre>
-cp -a openbcm-example-config/.gitignore openbcm-example-config/* /bcm
-cp -a msg /bcm/
-
-na rasbianu:
-cp -a ./out-x86_32/bcm /bcm/bin/
-
-na amd64 pc
-cp -a ./out-x86_64/bcm /bcm/bin/
-</pre>
-
-<p>Kao administrator je potrebno podesiti servis koji pokreće BBS.</p>
-<pre>
-sudo cp /bcm/bin/openbcm.service /etc/systemd/system/
-</pre>
-
-<p>Da bi sa korisnika na kome se vrti BBS mogli da restartujemo servis, biće nam potrebne sudoers stavke. </p>
-<pre>
-sudo visudo
-</pre>
-
-<p>I potom dodajte pri dnu sledeće:</p>
-<pre>
-bcm ALL= NOPASSWD: /usr/bin/systemctl restart openbcm
-bcm ALL= NOPASSWD: /usr/bin/systemctl stop openbcm
-bcm ALL= NOPASSWD: /usr/bin/systemctl start openbcm
-bcm ALL= NOPASSWD: /usr/bin/systemctl status openbcm
-bcm ALL= NOPASSWD: /usr/bin/systemctl enable openbcm
-bcm ALL= NOPASSWD: /usr/bin/systemctl disable openbcm
-</pre>
-
-<p>Na taj način možemo servisom upravljati sa <strong>bcm</strong> korisnika. A za lakše korišćenje istih napravio sam i shell scripte u /bcm/bin/, nazivi su jasni.</p>
-<pre>
-/bcm/bin/bcm-disable
-/bcm/bin/bcm-enable
-/bcm/bin/bcm-restart
-/bcm/bin/bcm-start
-/bcm/bin/bcm-status
-/bcm/bin/bcm-stop
-</pre>
-
-<h4 id="menjanje-konfiguracionih-fajlova"><a href="#menjanje-konfiguracionih-fajlova" class="headerlink" title="menjanje konfiguracionih fajlova."></a>menjanje konfiguracionih fajlova.</h4><p>u <strong>asysop.bcm</strong> treba dodati svoj pozivni znak.</p>
-<p>u <strong>init.bcm</strong> ja sam editovao sledeće</p>
-<pre>
-boxaddress YU4ZED.#SD.SRB.EU
-sysopcall YU4ZED
-
-http_port 8180
-ftp_port 0
-smtp_port 0
-pop3_port 0
-nntp_port 0
-telnet_port 4719
-serv_port 8123
-radio_port 0
-</pre>
-
-<p>boxaddress i sysop su očigledni, a ispod su portovi, ja sam neke malo promenio od defaulta i za sada iskljucio deo oko maila.</p>
-<h4 id="pokretanje"><a href="#pokretanje" class="headerlink" title="pokretanje"></a>pokretanje</h4><p>sa /bcm/bin/bcm-start možemo pokrenuti software. A potom i sa /bcm/bin/bcm-enable enablovati da se automatski pali prilikom pokretanja računara.</p>
-<h4 id="logovanje"><a href="#logovanje" class="headerlink" title="logovanje"></a>logovanje</h4><p>Za prvo logovanje, potrebno je to uraditi sa same BBS mašine komandom <strong>telnet localhost 4719</strong>, pošto u rhosts.bcm stoji localhost, sistem će vas pustiti bez šifre, kad podesite sebi šifru preporučljivo je da iz rhosts.bcm fajla izbacite localhost stavku.</p>
-<p>Podešavanje šifre za telnet/http pristup:</p>
-<pre>
-alter ttypw SIFRA123
-</pre>
-
-<p>Podešavanje tipa šifre. Sistem autentikacije je malo ukomplikovan i ja još nisam provalio kako/kad se tačno šta koristi. Ali mi korišćenje MD5 umesto pojedinačnih slova iz reči deluje kao dobra ideja.</p>
-<pre>
-alter loginpwtype md5
-alter sfpwtype md5
-</pre>
-
-<p>Podešavanje šifre koja će se koristi za taj vide autentikacije.</p>
-<pre>
-alter pw SIFRA123
-</pre>
-
-<p>Posle ovoga možemo se konektovati i preko http i preko telneta sa drugog računara.</p>
-<h4 id="otvaranje-naloga-drugima"><a href="#otvaranje-naloga-drugima" class="headerlink" title="otvaranje naloga drugima"></a>otvaranje naloga drugima</h4><pre>
-setu yu4zed ttypw SIFRA123
-</pre>
-
-<p>Ovim pravimo korisnika na sistemu, da bi mogli druge kolege da pustimo na naš BBS.</p>
-<h4 id="gosti-preko-http"><a href="#gosti-preko-http" class="headerlink" title="gosti preko http"></a>gosti preko http</h4><p>Da bi neko kao gost mogao preko httpa da pristupi, potrebno je uraditi par podešavanja.</p>
-<p>u init.bcm setovati <strong>httpguestfirst 1</strong> i <strong>guestcall GUEST</strong> kako bi http bio odmah kao gost, i da se gost zove GUEST na sistemu, još je potrebno iz konzole napraviti korisnika GUEST sa:</p>
-<pre>
-setuser GUEST ttypw GUEST
-</pre>
-
-<h4 id="pristup"><a href="#pristup" class="headerlink" title="pristup."></a>pristup.</h4><p>Da bi neko mogao da pristupi BBS, morate da uradite port forward na svom ruteru, i ako nemate statičku IP adresu da obezbedite neki DNS koji se updatuje kako se vašem internetu menja IP (dyndns).</p>
-<h4 id="sta-dalje"><a href="#sta-dalje" class="headerlink" title="šta dalje"></a>šta dalje</h4><p>Ovo je najjednostavniji setup, i nema baš mnogo smisla jer niti rezmenjuje poruke, niti radi kao pravi packet radio BBS.</p>
-<p>Naredni koraci su povezivanje sa modemom kako bi moglo preko radio talasa da mu se pristupi, verovatno setupovanje AX25 na linuxu. I potom razmena pošte sa drugim BBSovima, bilo putem radio talasa ili interneta.</p>
-<p>Naravno ja trenutno nemam predstavu kako sve to uraditi, ali radim na tome :)</p>
-<p>Inace moj BBS je na adresi <a href="http://bbs.zsteva.info:8180" target="_blank" rel="noopener">http://bbs.zsteva.info:8180</a> i osećajte se slobodnim da ga posetite, za account kontakt možete naci na <a href="http://yu4zed.zsteva.info" target="_blank" rel="noopener">http://yu4zed.zsteva.info</a></p>
-
 	
 	</div>
   <a type="button" href="/2018/11/23/Instaliranje-OpenBCM/#more" class="btn btn-default more">Read More</a>
@@ -357,11 +224,11 @@ setuser GUEST ttypw GUEST
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/packet-radio/">packet radio<span>1</span></a></li>
+			<li><a href="/tags/openbcm/">openbcm<span>1</span></a></li>
 		
 			<li><a href="/tags/bbs/">bbs<span>1</span></a></li>
 		
-			<li><a href="/tags/openbcm/">openbcm<span>1</span></a></li>
+			<li><a href="/tags/packet-radio/">packet radio<span>1</span></a></li>
 		
 		 
 		</ul>

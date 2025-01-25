@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Instaliranje OpenBCM | yu4zed pages</title>
+  <meta name="author" content="Zeljko Stevanovic">
+  
+  <meta name="description" content="Kratak vodič kako kompajlirati i instalirati OpenBCM. Od podešavanja nisam daleko stigao, ali ako želite da se igrate kao i ja, ovo će vas dovesti do početne tačke.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Instaliranje OpenBCM"/>
+  <meta property="og:site_name" content="yu4zed pages"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/lumen.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight-default.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/comment.css" media="screen" type="text/css">
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.9/es5-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
+  <![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+  
+  <!-- analytics -->
+  
+
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar  navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">yu4zed pages</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header ">		
+			<h1 class="title "> Instaliranje OpenBCM</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>Kratak vodič kako kompajlirati i instalirati OpenBCM. Od podešavanja nisam daleko stigao, ali ako želite da se igrate kao i ja, ovo će vas dovesti do početne tačke.</p>
+<img src="/2018/11/23/Instaliranje-OpenBCM/openbcm-http.png" class="">
+
+<span id="more"></span>
+
+<p>Sajt autora programa: <a href="http://dnx274.org/baybox/">http://dnx274.org/baybox/</a>, gde se može i naći dokumentacija.</p>
+<h2 id="depending"><a href="#depending" class="headerlink" title="depending"></a>depending</h2><h4 id="rasbian-debian-ubuntu"><a href="#rasbian-debian-ubuntu" class="headerlink" title="rasbian &#x2F; debian &#x2F; ubuntu"></a>rasbian &#x2F; debian &#x2F; ubuntu</h4><pre>
+sudo apt-get install -y build-essential git
+</pre>
+
+<p>Za 64 bitni sistem treba još dodati:</p>
+<pre>
+sudo apt-get install -y libc6-dev-i386 lib32stdc++-5-dev
+</pre>
+
+<h4 id="arch-linux"><a href="#arch-linux" class="headerlink" title="arch linux"></a>arch linux</h4><pre>
+sudo pacman -S git base-devel lib32-glibc lib32-gcc-libs
+</pre>
+
+<h2 id="korisnik"><a href="#korisnik" class="headerlink" title="korisnik"></a>korisnik</h2><p>BBS ćemo pokretati na posebnom korisniku, koji nema prava administratora. Neke funkcije zahtevaju administratorska prava, ali ću radije živeti bez njih ili tek kad budem siguran šta i kako radi dozvoliti.</p>
+<h4 id="pravljenje-korisnika-i-direktorijuma"><a href="#pravljenje-korisnika-i-direktorijuma" class="headerlink" title="pravljenje korisnika i direktorijuma"></a>pravljenje korisnika i direktorijuma</h4><p>Ja sam odabrao korisničko ime <strong>bcm</strong>, vi možete neko drugo. I direktorijum u kojem će stojati sve je <strong>&#x2F;bcm</strong>, tako je bilo u nekom primeru pa sam to zadržao.</p>
+<pre>
+sudo useradd -m bcm
+sudo mkdir /bcm
+sudo chown bcm:bcm /bcm
+sudo chmod 0750 /bcm
+</pre>
+
+<h4 id="kompajliranje"><a href="#kompajliranje" class="headerlink" title="kompajliranje"></a>kompajliranje</h4><p>Sve dalje, osim par koraka radim sa <strong>bcm</strong> korisnika.</p>
+<pre>
+mkdir ~/src
+cd ~/src
+git clone https://github.com/oe5hpm/openBCM
+cd openBCM
+make
+</pre>
+
+<p>Ako komapjliranje ne prođe, verovatno na vašem sistemu nije zadovoljen depending koji sam gore naveo… Ja sam probao na ubuntu 16.04, rasbianu i archu.</p>
+<p>Pošto u samoj instalaciji nema primera konfiguracionih fajlova, ja sam sa sajta autora skinuo primere, i dodao još po nešto, i zakomentarisao neke stvari koje nisam još siguran kako rade.</p>
+<pre>
+git clone https://github.com/yu4zed/openbcm-example-config
+</pre>
+
+<p>Instaliranje:</p>
+<pre>
+cp -a openbcm-example-config/.gitignore openbcm-example-config/* /bcm
+cp -a msg /bcm/
+
+na rasbianu:
+cp -a ./out-x86_32/bcm /bcm/bin/
+
+na amd64 pc
+cp -a ./out-x86_64/bcm /bcm/bin/
+</pre>
+
+<p>Kao administrator je potrebno podesiti servis koji pokreće BBS.</p>
+<pre>
+sudo cp /bcm/bin/openbcm.service /etc/systemd/system/
+</pre>
+
+<p>Da bi sa korisnika na kome se vrti BBS mogli da restartujemo servis, biće nam potrebne sudoers stavke. </p>
+<pre>
+sudo visudo
+</pre>
+
+<p>I potom dodajte pri dnu sledeće:</p>
+<pre>
+bcm ALL= NOPASSWD: /usr/bin/systemctl restart openbcm
+bcm ALL= NOPASSWD: /usr/bin/systemctl stop openbcm
+bcm ALL= NOPASSWD: /usr/bin/systemctl start openbcm
+bcm ALL= NOPASSWD: /usr/bin/systemctl status openbcm
+bcm ALL= NOPASSWD: /usr/bin/systemctl enable openbcm
+bcm ALL= NOPASSWD: /usr/bin/systemctl disable openbcm
+</pre>
+
+<p>Na taj način možemo servisom upravljati sa <strong>bcm</strong> korisnika. A za lakše korišćenje istih napravio sam i shell scripte u &#x2F;bcm&#x2F;bin&#x2F;, nazivi su jasni.</p>
+<pre>
+/bcm/bin/bcm-disable
+/bcm/bin/bcm-enable
+/bcm/bin/bcm-restart
+/bcm/bin/bcm-start
+/bcm/bin/bcm-status
+/bcm/bin/bcm-stop
+</pre>
+
+<h4 id="menjanje-konfiguracionih-fajlova"><a href="#menjanje-konfiguracionih-fajlova" class="headerlink" title="menjanje konfiguracionih fajlova."></a>menjanje konfiguracionih fajlova.</h4><p>u <strong>asysop.bcm</strong> treba dodati svoj pozivni znak.</p>
+<p>u <strong>init.bcm</strong> ja sam editovao sledeće</p>
+<pre>
+boxaddress YU4ZED.#SD.SRB.EU
+sysopcall YU4ZED
+
+http_port 8180
+ftp_port 0
+smtp_port 0
+pop3_port 0
+nntp_port 0
+telnet_port 4719
+serv_port 8123
+radio_port 0
+</pre>
+
+<p>boxaddress i sysop su očigledni, a ispod su portovi, ja sam neke malo promenio od defaulta i za sada iskljucio deo oko maila.</p>
+<h4 id="pokretanje"><a href="#pokretanje" class="headerlink" title="pokretanje"></a>pokretanje</h4><p>sa &#x2F;bcm&#x2F;bin&#x2F;bcm-start možemo pokrenuti software. A potom i sa &#x2F;bcm&#x2F;bin&#x2F;bcm-enable enablovati da se automatski pali prilikom pokretanja računara.</p>
+<h4 id="logovanje"><a href="#logovanje" class="headerlink" title="logovanje"></a>logovanje</h4><p>Za prvo logovanje, potrebno je to uraditi sa same BBS mašine komandom <strong>telnet localhost 4719</strong>, pošto u rhosts.bcm stoji localhost, sistem će vas pustiti bez šifre, kad podesite sebi šifru preporučljivo je da iz rhosts.bcm fajla izbacite localhost stavku.</p>
+<p>Podešavanje šifre za telnet&#x2F;http pristup:</p>
+<pre>
+alter ttypw SIFRA123
+</pre>
+
+<p>Podešavanje tipa šifre. Sistem autentikacije je malo ukomplikovan i ja još nisam provalio kako&#x2F;kad se tačno šta koristi. Ali mi korišćenje MD5 umesto pojedinačnih slova iz reči deluje kao dobra ideja.</p>
+<pre>
+alter loginpwtype md5
+alter sfpwtype md5
+</pre>
+
+<p>Podešavanje šifre koja će se koristi za taj vide autentikacije.</p>
+<pre>
+alter pw SIFRA123
+</pre>
+
+<p>Posle ovoga možemo se konektovati i preko http i preko telneta sa drugog računara.</p>
+<h4 id="otvaranje-naloga-drugima"><a href="#otvaranje-naloga-drugima" class="headerlink" title="otvaranje naloga drugima"></a>otvaranje naloga drugima</h4><pre>
+setu yu4zed ttypw SIFRA123
+</pre>
+
+<p>Ovim pravimo korisnika na sistemu, da bi mogli druge kolege da pustimo na naš BBS.</p>
+<h4 id="gosti-preko-http"><a href="#gosti-preko-http" class="headerlink" title="gosti preko http"></a>gosti preko http</h4><p>Da bi neko kao gost mogao preko httpa da pristupi, potrebno je uraditi par podešavanja.</p>
+<p>u init.bcm setovati <strong>httpguestfirst 1</strong> i <strong>guestcall GUEST</strong> kako bi http bio odmah kao gost, i da se gost zove GUEST na sistemu, još je potrebno iz konzole napraviti korisnika GUEST sa:</p>
+<pre>
+setuser GUEST ttypw GUEST
+</pre>
+
+<h4 id="pristup"><a href="#pristup" class="headerlink" title="pristup."></a>pristup.</h4><p>Da bi neko mogao da pristupi BBS, morate da uradite port forward na svom ruteru, i ako nemate statičku IP adresu da obezbedite neki DNS koji se updatuje kako se vašem internetu menja IP (dyndns).</p>
+<h4 id="sta-dalje"><a href="#sta-dalje" class="headerlink" title="šta dalje"></a>šta dalje</h4><p>Ovo je najjednostavniji setup, i nema baš mnogo smisla jer niti rezmenjuje poruke, niti radi kao pravi packet radio BBS.</p>
+<p>Naredni koraci su povezivanje sa modemom kako bi moglo preko radio talasa da mu se pristupi, verovatno setupovanje AX25 na linuxu. I potom razmena pošte sa drugim BBSovima, bilo putem radio talasa ili interneta.</p>
+<p>Naravno ja trenutno nemam predstavu kako sve to uraditi, ali radim na tome :)</p>
+<p>Inace moj BBS je na adresi <a href="http://bbs.zsteva.info:8180/">http://bbs.zsteva.info:8180</a> i osećajte se slobodnim da ga posetite, za account kontakt možete naci na <a href="http://yu4zed.zsteva.info/">http://yu4zed.zsteva.info</a></p>
+	  
+	</div>
+
+	<!-- recommended posts -->
+	
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+  
+</section>
+
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2018-11-23 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/packet-radio/">packet radio<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/openbcm/">openbcm<span>1</span></a></li> <li><a href="/tags/packet-radio/">packet radio<span>1</span></a></li> <li><a href="/tags/bbs/">bbs<span>1</span></a></li>
+    </ul>
+	</div>
+	
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2025 Zeljko Stevanovic
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+
+<!-- syntax highlighting -->
+
+
+</body>
+   </html>
